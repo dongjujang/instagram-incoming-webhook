@@ -8,4 +8,4 @@
 
 ## Run
 
-	docker run -p 8888:8888 --link mongodb/mongodb --rm --name instagram-incoming-webhook instagram-incoming-webhook
+	docker run -p 8888:8888 --link mongodb:mongodb --rm --name instagram-incoming-webhook instagram-incoming-webhook
