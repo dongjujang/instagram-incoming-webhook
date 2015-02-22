@@ -23,6 +23,7 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
     keys = ['user_id',
             'media_id',
             'username',
+            'link',
             'image',
             'text',
             'created_time']
@@ -32,6 +33,10 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
       if not value:
         isValid = False
         break
+      if key == 'link':
+        value = value.replace('http://instagram.com/p/', '')
+        value = value.replace('https://instagram.com/p/', '')
+        value = value.replace('/', '')
       doc[key] = value
 
     if not isValid:
