@@ -30,9 +30,12 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
     doc = {}
     for key in keys:
       value = self.get_argument(key, None)
-      if not value:
-        isValid = False
-        break
+      if key == 'text' and not value:
+        pass
+      else:
+        if not value:
+          isValid = False
+          break
       if key == 'link':
         value = value.replace('http://instagram.com/p/', '')
         value = value.replace('https://instagram.com/p/', '')
