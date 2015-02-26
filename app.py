@@ -46,7 +46,9 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
       status_code = 400
     else:
       collection = DB[doc['user_id']]
-      collection.insert(doc)
+      found_doc = collection.find_one({'media_id': doc['media_id']})
+      if not found_doc:
+        collection.insert(doc)
 
     self.set_status(status_code)
     self.set_header('Content-Type', 'application/json')
