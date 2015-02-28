@@ -12,10 +12,10 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
   @tornado.web.asynchronous
   def get(self):
     self.set_header('Content-Type', 'application/json')
-    response = {}
-    self.write(json.dumps(response))
+    self.write('')
     self.finish()
-      
+
+class MediaHandler(SentryMixin, tornado.web.RequestHandler):
   @tornado.web.asynchronous
   def post(self):
     isValid = True
@@ -55,8 +55,18 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
     self.write('')
     self.finish()
 
+class CommentHandler(SentryMixin, tornado.web.RequestHandler):
+  @tornado.web.asynchronous
+  def post(self):
+    self.set_status(200)
+    self.set_header('Content-Type', 'application/json')
+    self.write('')
+    self.finish()
+
 application = tornado.web.Application([
     (r'/', IndexHandler),
+    (r'/media', MediaHandler),
+    (r'/comment', CommentHandler),
 ])
 
 application.sentry_client = AsyncSentryClient(os.environ.get('SENTRY_API_KEY', ''))
