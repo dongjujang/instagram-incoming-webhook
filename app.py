@@ -18,7 +18,7 @@ class IndexHandler(SentryMixin, tornado.web.RequestHandler):
 class MediaHandler(SentryMixin, tornado.web.RequestHandler):
   @tornado.web.asynchronous
   def post(self):
-    isValid = True
+    valid = True
     status_code = 200
     keys = ['user_id',
             'media_id',
@@ -34,7 +34,7 @@ class MediaHandler(SentryMixin, tornado.web.RequestHandler):
         pass
       else:
         if not value:
-          isValid = False
+          valid = False
           break
       if key == 'link':
         value = value.replace('http://instagram.com/p/', '')
@@ -42,7 +42,7 @@ class MediaHandler(SentryMixin, tornado.web.RequestHandler):
         value = value.replace('/', '')
       doc[key] = value
 
-    if not isValid:
+    if not valid:
       status_code = 400
     else:
       collection = DB[doc['user_id']]
@@ -58,7 +58,46 @@ class MediaHandler(SentryMixin, tornado.web.RequestHandler):
 class CommentHandler(SentryMixin, tornado.web.RequestHandler):
   @tornado.web.asynchronous
   def post(self):
-    self.set_status(200)
+    valid = True
+    status_code = 200
+    keys = ['media_user_id',
+            'media_id',
+            'user_id',
+            'username',
+            'text',
+            'created_time']
+    doc = {}
+    for key in keys:
+      value = self.get_argument(key, None)
+      if not value:
+        valid = False
+        break
+      doc[key] = value
+
+    if not valid:
+      status_code = 400
+    else:
+      collection = DB[doc['user_id']]
+      found_doc = collection.find_one({'media_id': doc['media_id']})
+      if not found_doc:
+        pass
+      comments = found_doc.get('comments', [])
+      exist = False
+      for comment in comments:
+        if comment.get('created_time', '') == doc['created_time']:
+          exist = True
+          break
+      if exist:
+        pass
+      comments.append({'user_id': doc['user_id'],
+                       'username': doc['username'],
+                       'text': doc['text'],
+                       'created_time': doc['created_time']})
+      comments = sorted(comments, key=lambda x: x['created_time'], reverse=True)
+      found_doc['comments'] = comments
+      collection.update({'media_id': doc['media_id']}, found_doc)
+    
+    self.set_status(status_code)
     self.set_header('Content-Type', 'application/json')
     self.write('')
     self.finish()
