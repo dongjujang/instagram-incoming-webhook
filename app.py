@@ -104,7 +104,9 @@ class CommentHandler(SentryMixin, tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r'/', IndexHandler),
+    (r'/media/', MediaHandler),
     (r'/media', MediaHandler),
+    (r'/comment/', CommentHandler),
     (r'/comment', CommentHandler),
 ])
 
