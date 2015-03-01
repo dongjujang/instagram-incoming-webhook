@@ -49,6 +49,15 @@ class MediaHandler(SentryMixin, tornado.web.RequestHandler):
       found_doc = collection.find_one({'media_id': doc['media_id']})
       if not found_doc:
         collection.insert(doc)
+        
+      recent_media_collection = DB['recent_media']
+      found_doc = recent_media_collection.find_one({'media_id': doc['media_id']})
+      if not found_doc:
+        recent_media_collection.insert(doc)
+        recent_docs = recent_media_collection.find({}).sort('created_time', pymongo.DESCENDING).skip(50)
+        if recent_docs:
+          for recent_doc in recent_docs:
+            recent_media_collection.remove(recent_doc)
 
     self.set_status(status_code)
     self.set_header('Content-Type', 'application/json')
