@@ -47,8 +47,9 @@ class MediaHandler(SentryMixin, tornado.web.RequestHandler):
     else:
       collection = DB[doc['user_id']]
       found_doc = collection.find_one({'media_id': doc['media_id']})
-      if not found_doc:
-        collection.insert(doc)
+      if found_doc:
+        pass
+      collection.insert(doc)
         
       recent_media_collection = DB['recent_media']
       found_doc = recent_media_collection.find_one({'media_id': doc['media_id']})
